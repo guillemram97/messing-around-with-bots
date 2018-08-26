@@ -57,48 +57,6 @@ def personal_info(cv, print_info=False):
 #inici del codi que entra en el correu
 def handler(event, context):
 
-    #la funcio get attachements retorna un llista amb un boolea de si tenim o no un curriculum i una string amb el curriculum
-    def GetAttachments(service, user_id, msg_id, store_dir="C:/Users/joanarino/Documents/bot a join/bla.pdf"):
-    	found_pdf = False
-    	lletra = ""
-    	try:
-    		message = service.users().messages().get(userId=user_id, id=msg_id).execute()
-    		parts = [message['payload']]
-    		while parts:
-    			part = parts.pop()
-    			if part.get('parts'):
-    				parts.extend(part['parts'])
-    			if part.get('filename'):
-    				if 'data' in part['body']:
-    					file_data = base64.urlsafe_b64decode(part['body']['data'].encode('UTF-8'))
-    					#self.stdout.write('FileData for %s, %s found! size: %s' % (message['id'], part['filename'], part['size']))
-    				elif 'attachmentId' in part['body']:
-    					attachment = service.users().messages().attachments().get(
-    						userId=user_id, messageId=message['id'], id=part['body']['attachmentId']
-    					).execute()
-    					file_data = base64.urlsafe_b64decode(attachment['data'].encode('UTF-8'))
-    					#self.stdout.write('FileData for %s, %s found! size: %s' % (message['id'], part['filename'], attachment['size']))
-    				else:
-    					file_data = None
-    				if file_data:
-                        #ens assegurem que el fitxer tingui .pdf en el nom i no dni
-    					if ".pdf" in part['filename']:
-    						if "dni" not in part['filename'].lower():
-    							found_pdf = True
-                                #si es aixi n'extraiem el text usant el package pypdf2
-    							try:
-    								pdf_content = io.BytesIO(file_data)
-    								pdfReader = PyPDF2.PdfFileReader(pdf_content)
-    								for i in range (0, pdfReader.numPages):
-    									pageObj = pdfReader.getPage(i)
-    									lletra = lletra + pageObj.extractText()
-    							except:
-    								pass
-    	except errors.HttpError as error:
-    		print ("An error occurred: %s' % error")
-    	return [found_pdf, lletra]
-
-
     #usa les credencials per obrir el gmail
     SCOPES = 'https://www.googleapis.com/auth/gmail.readonly' # we are using modify and not readonly, as we will be marking the messages Read
     store = file.Storage('storage.json')
